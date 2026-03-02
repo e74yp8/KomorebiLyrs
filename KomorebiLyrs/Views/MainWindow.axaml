@@ -14,6 +14,7 @@
         TransparencyLevelHint="Transparent"
         Background="Transparent"
         ExtendClientAreaChromeHints="NoChrome"
+        Opacity="{Binding WindowOpacity}"
         
         Topmost="True"
         CanResize="False"

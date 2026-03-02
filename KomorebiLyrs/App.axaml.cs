@@ -27,31 +27,47 @@ public partial class App : Application
             DisableAvaloniaDataAnnotationValidation();
             IMediaService mediaService;
             IWindowTraitService windowTraitService;
-            #if WINDOWS
-                    mediaService = new WindowsMediaService();
-                    windowTraitService = new WindowTraitService();
-            #else
+#if WINDOWS
+            mediaService = new WindowsMediaService();
+            windowTraitService = new WindowTraitService();
+#else
                     mediaService = new DummyMediaService();
                     windowTraitService = new DummyWindowTraitService();
-            #endif
+#endif
 
-            var mainWindow = new MainWindow();
-            
-            #if WINDOWS
-            if (windowTraitService is WindowTraitService winService)
-            {
-                winService.SetTargetWindow(mainWindow);
-            }
-            #endif
-            
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(mediaService,windowTraitService)
+                DataContext = new MainWindowViewModel(mediaService, windowTraitService)
+            };
+
+            desktop.Startup += (sender, args) =>
+            {
+#if WINDOWS
+                if (windowTraitService is WindowTraitService winService && desktop.MainWindow != null)
+                {
+                    winService.SetTargetWindow(desktop.MainWindow);
+                }
+                // Initialize TrayIconService
+                _trayIconService = new TrayIconService(windowTraitService);
+#endif  
+            };
+
+            desktop.MainWindow.Opened += (sender, args) =>
+            {
+                windowTraitService.SetClickThrough(true);
+            };
+            
+            desktop.Exit += (sender, args) =>
+            {
+                _trayIconService?.Dispose();
             };
         }
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    private TrayIconService? _trayIconService;
+
 
     private void DisableAvaloniaDataAnnotationValidation()
     {

@@ -24,26 +24,32 @@ public class WindowTraitService : IWindowTraitService
     {
         _targetWindow = targetWindow;
     }
-    
+
+    public bool IsClickThroughEnabled { get; private set; }
+    public event EventHandler<bool>? ClickThroughChanged;
+
     public void SetClickThrough(bool enable)
     {
+        if (IsClickThroughEnabled == enable) return;
+
+        IsClickThroughEnabled = enable;
+        ClickThroughChanged?.Invoke(this, enable);
+
         if (_targetWindow == null) return;
 
         var handle = _targetWindow.TryGetPlatformHandle();
         if (handle == null) return;
-        
+
         var hwnd = handle.Handle;
         var exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
 
         if (enable)
         {
             SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
-            _targetWindow.Topmost = true;
         }
         else
         {
             SetWindowLong(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_TRANSPARENT);
-            _targetWindow.Topmost = false;
         }
     }
 }
