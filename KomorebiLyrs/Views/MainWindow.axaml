@@ -23,6 +23,8 @@
         SystemDecorations="None"
         
         WindowStartupLocation="CenterScreen"
+        
+        PointerPressed="OnPointerPressed"
         >
 
     <Design.DataContext>
