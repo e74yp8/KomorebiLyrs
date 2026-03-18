@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
@@ -20,24 +21,33 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        
+        
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
             // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
-            IMediaService mediaService;
+           
             IWindowTraitService windowTraitService;
+            var settingService = new SettingService();
+
+            var mediaServices = new List<IMediaService>();
+            
 #if WINDOWS
-            mediaService = new WindowsMediaService();
+            mediaServices.Add(new WindowsMediaService());
+            mediaServices.Add(new DummyMediaService());
             windowTraitService = new WindowTraitService();
 #else
-                    mediaService = new DummyMediaService();
+                    mediaServices.Add(new DummyMediaService());
                     windowTraitService = new DummyWindowTraitService();
-#endif
+#endif  
 
+            var mediaServiceManager = new MediaServiceManager(settingService, mediaServices);
+            
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(mediaService, windowTraitService)
+                DataContext = new MainWindowViewModel(mediaServiceManager, windowTraitService)
             };
 
             desktop.Startup += (sender, args) =>
