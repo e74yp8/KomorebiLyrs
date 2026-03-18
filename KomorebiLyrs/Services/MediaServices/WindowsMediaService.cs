@@ -1,11 +1,14 @@
 ﻿#if WINDOWS
 using System;
 using Windows.Media.Control;
+using KomorebiLyrs.Models;
 
 namespace KomorebiLyrs.Services;
 
 public class WindowsMediaService : IMediaService
 {
+    public AppSettings.MediaProviderType ProviderType => AppSettings.MediaProviderType.Windows;
+    
     private GlobalSystemMediaTransportControlsSessionManager? _manager;
 
     public event EventHandler<MediaInfoEventArgs>? MediaChanged;
@@ -38,7 +41,7 @@ public class WindowsMediaService : IMediaService
         if (session != null)
         {
             var properties = await session.TryGetMediaPropertiesAsync();
-            // 觸發事件通知 ViewModel
+            // invoke event to ViewModel
             MediaChanged?.Invoke(this, new MediaInfoEventArgs 
             { 
                 Title = properties.Title, 

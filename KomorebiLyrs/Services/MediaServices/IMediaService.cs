@@ -1,9 +1,11 @@
 ﻿using System;
+using KomorebiLyrs.Models;
 
 namespace KomorebiLyrs.Services;
 
 public interface IMediaService
 {
+    AppSettings.MediaProviderType ProviderType { get; }
     event EventHandler<MediaInfoEventArgs>? MediaChanged;
     void Start();
 }
