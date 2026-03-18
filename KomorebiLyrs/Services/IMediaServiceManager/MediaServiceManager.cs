@@ -32,7 +32,17 @@ public class MediaServiceManager: IMediaServiceManager
 
     private void UpdateStrategy(AppSettings settings)
     {
-        // 1. Unsubscribe from the old strategy to prevent memory leaks
+        // Resolve the strategy that matches the current settings
+        var newStrategy = _services.FirstOrDefault(s => s.ProviderType == settings.MediaProvider)
+                          ?? _services.FirstOrDefault(s => s.ProviderType == AppSettings.MediaProviderType.Dummy);
+
+        // If the strategy instance hasn't changed, avoid re-subscribing and re-starting
+        if (ReferenceEquals(newStrategy, _currentStrategy))
+        {
+            return;
+        }
+
+        // Unsubscribe from the old strategy to prevent memory leaks
         if (_currentStrategy != null)
         {
             _currentStrategy.MediaChanged -= OnStrategyMediaChanged;
@@ -40,12 +50,9 @@ public class MediaServiceManager: IMediaServiceManager
             // Optionally stop the old strategy if IMediaService has a Stop() method
         }
 
-        
-        _currentStrategy = _services.FirstOrDefault(s => s.ProviderType == settings.MediaProvider) 
-                           ?? _services.FirstOrDefault(s => s.ProviderType == AppSettings.MediaProviderType.Dummy);
+        _currentStrategy = newStrategy;
 
-            
-        // 3. Subscribe to the new strategy
+        // Subscribe to and start the new strategy
         if (_currentStrategy != null)
         {
             _currentStrategy.MediaChanged += OnStrategyMediaChanged;
