@@ -14,7 +14,7 @@ public class MediaServiceManager: IMediaServiceManager
     public AppSettings.MediaProviderType CurrentProvider => _currentStrategy?.ProviderType ?? AppSettings.MediaProviderType.Dummy;
     public event EventHandler<MediaInfoEventArgs>? MediaChanged;
 
-    // Inject IServiceProvider so we can resolve specific media services dynamically
+    // Inject available media services so we can select the appropriate one based on settings
     public MediaServiceManager(SettingService settingService,IEnumerable<IMediaService> services)
     {
         _settingService = settingService;
