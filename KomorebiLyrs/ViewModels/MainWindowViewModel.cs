@@ -16,19 +16,19 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private string artist = "";
     [ObservableProperty] private string fullInfo = "";
 
-    private IMediaServiceManager _mediaService;
+    private IMediaServiceManager _mediaServiceManager;
     private readonly IWindowTraitService _windowTraitService;
 
     [ObservableProperty] private bool _isLocked;
     [ObservableProperty] private double _windowOpacity = 1.0;
 
-    public MainWindowViewModel(IMediaServiceManager mediaService, IWindowTraitService windowTraitService)
+    public MainWindowViewModel(IMediaServiceManager mediaServiceManager, IWindowTraitService windowTraitService)
     {
-        _mediaService = mediaService;
+        _mediaServiceManager = mediaServiceManager;
         _windowTraitService = windowTraitService;
 
-        _mediaService.MediaChanged += OnMediaChanged;
-        _mediaService.Start();
+        _mediaServiceManager.MediaChanged += OnMediaChanged;
+        _mediaServiceManager.Start();
 
         _windowTraitService.ClickThroughChanged += OnClickThroughChanged;
         

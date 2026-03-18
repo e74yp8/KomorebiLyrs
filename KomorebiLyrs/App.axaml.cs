@@ -36,6 +36,7 @@ public partial class App : Application
             
 #if WINDOWS
             mediaServices.Add(new WindowsMediaService());
+            mediaServices.Add(new DummyMediaService());
             windowTraitService = new WindowTraitService();
 #else
                     mediaServices.Add(new DummyMediaService());
