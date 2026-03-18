@@ -17,7 +17,8 @@ public class SettingService
     
         public AppSettings GetSettings()
         {
-            return _settings;
+            // Return a shallow copy to prevent external mutations
+            return _settings with { };
         }
     
         public void UpdateSettings(AppSettings newSettings)
