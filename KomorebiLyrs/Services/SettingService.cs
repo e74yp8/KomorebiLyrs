@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json;
 using KomorebiLyrs.Models;
 
 namespace KomorebiLyrs.Services;
@@ -11,6 +12,11 @@ public class SettingService
         private readonly string _settingsFilePath;
         
         private readonly bool _canSaveToDisk;
+        
+        private static readonly JsonSerializerOptions SerializerOptions = new() 
+        { 
+            WriteIndented = true 
+        };
         
         public event EventHandler<AppSettings>? SettingsChanged;
     
@@ -43,14 +49,33 @@ public class SettingService
     
         private AppSettings? LoadSettings()
         {
-            // Implement loading logic (e.g., from JSON file)
-            // Return null if no settings file exists
-            return null;
+            if (!File.Exists(_settingsFilePath)) return null;
+            
+            try
+            {
+                var json = File.ReadAllText(_settingsFilePath);
+                return JsonSerializer.Deserialize<AppSettings>(json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Error] Failed to load settings: {ex.Message}");
+                return null;
+            }
         }
     
         private void SaveSettings(AppSettings settings)
         {
-            // Implement saving logic (e.g., to JSON file)
+            if (!_canSaveToDisk) return;
+
+            try
+            {
+                var json = JsonSerializer.Serialize(settings, SerializerOptions);
+                File.WriteAllText(_settingsFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Error] Failed to save settings: {ex.Message}");
+            }
         }
         
         private bool EnsureDirectoryExists(string folderPath)
